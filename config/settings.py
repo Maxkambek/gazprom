@@ -11,6 +11,8 @@ ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+AUTH_USER_MODEL = 'accounts.Account'
+
 INSTALLED_APPS = [
     'jazzmin',
     'modeltranslation',
@@ -25,6 +27,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
+    'accounts',
 ]
 
 MIDDLEWARE = [
