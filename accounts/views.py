@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from .models import Account
-from .serializers import LoginSerializer, AccountSerializer
+from .serializers import LoginSerializer, AccountSerializer, RegisterSerializer
 
 
 class LoginAPI(generics.GenericAPIView):
@@ -40,3 +40,22 @@ class WorkersList(generics.ListAPIView):
     def get_queryset(self):
         queryset = Account.objects.filter(is_staff=True)
         return queryset
+
+
+class RegisterAPI(generics.GenericAPIView):
+    serializer_class = RegisterSerializer
+
+    def post(self, request, *args, **kwargs):
+        username = self.request.data['username']
+        pas = request.data['password']
+        if not username:
+            return Response({'Telefon raqam kemadi tupoymisz?'}, status=404)
+        if Account.objects.filter(username=username).first():
+            return Response({'message': "This number already exist"}, status=status.HTTP_302_FOUND)
+        user = Account.objects.create_user(
+            username=username,
+            password=pas
+        )
+        user.save()
+        return Response({"success": True, 'message': "User created"},
+                        status=status.HTTP_200_OK)

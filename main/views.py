@@ -1,9 +1,11 @@
 import datetime
-
+from rest_framework.settings import api_settings
+from accounts.models import Account
 from .models import Product, OrderClient, OrderClientFile, OrderClientProducts
 from rest_framework import generics, authentication, permissions
 from rest_framework.views import Response, status, APIView
 from . import serializers
+from accounts.utils import verify
 
 
 class OrderClientFileCreateAPIView(generics.CreateAPIView):
@@ -30,6 +32,34 @@ class ProductListAPIView(generics.ListAPIView):
 class OrderClientCreateAPIView(generics.CreateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.OrderClientCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+        phone = serializer.data['phone']
+        id = serializer.data['id']
+        try:
+            user = Account.objects.create(
+                username=phone,
+                password="12345678"
+            )
+            user.save()
+            verify(phone)
+        except:
+            obj = OrderClient.objects.filter(id=id).first()
+            obj.client.username = phone
+
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
 
 
 class OrderClientListAPIView(generics.ListAPIView):
@@ -81,9 +111,9 @@ class StatisticsAPIView(APIView):
         month = self.request.GET.get('month')
         year = self.request.GET.get('year')
         if today:
-            queryset = queryset.filter(created_time__day=today)
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
-            queryset = queryset.filter(created_time__day=yesterday)
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
         if week:
             queryset = queryset.filter(
                 created_time__range=[datetime.datetime.now() - datetime.timedelta(days=7), datetime.datetime.now()])

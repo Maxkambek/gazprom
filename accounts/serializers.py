@@ -10,9 +10,13 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ['username', 'password']
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=64, min_length=8)
-
+class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['full_name']
+        fields = ['username', 'password']
+
+
+class AccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ('full_name',)
