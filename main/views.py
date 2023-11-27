@@ -6,6 +6,11 @@ from rest_framework.views import Response, status, APIView
 from . import serializers
 
 
+class OrderClientFileCreateAPIView(generics.CreateAPIView):
+    queryset = OrderClientFile.objects.all()
+    serializer_class = serializers.OrderClientFileSerializer
+
+
 class ProductCreateAPIView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = serializers.ProductSerializer
