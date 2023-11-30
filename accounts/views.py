@@ -59,3 +59,8 @@ class RegisterAPI(generics.GenericAPIView):
         user.save()
         return Response({"success": True, 'message': "User created"},
                         status=status.HTTP_200_OK)
+
+
+class StaffListAPIView(generics.ListAPIView):
+    queryset = Account.objects.filter(is_staff=True)
+    serializer_class = AccountSerializer

@@ -51,6 +51,9 @@ class OrderClient(models.Model):
     is_checked = models.BooleanField(default=False)
     is_available = models.BooleanField(default=False)
     ready_for_paid = models.BooleanField(default=False)
+    level_order = models.PositiveIntegerField(default=1)
+    inspector_1 = models.BooleanField(default=False)
+    inspector_2 = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name_org
@@ -70,3 +73,11 @@ class OrderClientProducts(models.Model):
     count = models.PositiveIntegerField(default=1)
 
 
+class UzStandard(models.Model):
+    file_1 = models.FileField(upload_to='uz_standard/')
+    file_2 = models.FileField(upload_to='uz_standard/', null=True, blank=True)
+    file_3 = models.FileField(upload_to='uz_standard/', null=True, blank=True)
+    order = models.ForeignKey(OrderClient, on_delete=models.CASCADE, related_name='uaz_standard_files')
+
+    def __str__(self):
+        return self.order.name_org

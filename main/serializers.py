@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Product, OrderClient, OrderClientFile, OrderClientProducts
+from .models import Product, OrderClient, OrderClientFile, OrderClientProducts, UzStandard
+
+
+class UzStandardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UzStandard
+        fields = ['file_1', 'file_2', 'file_3', 'order']
 
 
 class ProductSerializer(serializers.ModelSerializer):

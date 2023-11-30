@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 
 class AccountManager(BaseUserManager):
@@ -39,6 +40,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
     role = models.CharField(choices=ROLE, max_length=25, default='receiver')
+    history = HistoricalRecords()
 
     USERNAME_FIELD = 'username'
     objects = AccountManager()

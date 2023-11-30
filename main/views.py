@@ -1,23 +1,32 @@
 import datetime
 from rest_framework.settings import api_settings
 from accounts.models import Account
-from .models import Product, OrderClient, OrderClientFile, OrderClientProducts
+from .models import Product, OrderClient, OrderClientFile, OrderClientProducts, UzStandard
 from rest_framework import generics, authentication, permissions
 from rest_framework.views import Response, status, APIView
 from . import serializers
 from accounts.utils import verify
 
 
+# uz standard
+class UzStandardCreateAPIView(generics.CreateAPIView):
+    queryset = UzStandard.objects.all()
+    serializer_class = serializers.UzStandardSerializer
+
+
+# receiver
 class OrderClientFileCreateAPIView(generics.CreateAPIView):
     queryset = OrderClientFile.objects.all()
     serializer_class = serializers.OrderClientFileSerializer
 
 
+# accountant
 class ProductCreateAPIView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = serializers.ProductSerializer
 
 
+# specialist accountant
 class ProductListAPIView(generics.ListAPIView):
     serializer_class = serializers.ProductSerializer
 
@@ -29,6 +38,7 @@ class ProductListAPIView(generics.ListAPIView):
         return queryset
 
 
+# receiver
 class OrderClientCreateAPIView(generics.CreateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.OrderClientCreateSerializer
@@ -43,17 +53,20 @@ class OrderClientCreateAPIView(generics.CreateAPIView):
     def perform_create(self, serializer):
         serializer.save()
         phone = serializer.data['phone']
-        id = serializer.data['id']
-        try:
+        order_id = serializer.data['id']
+        user = Account.objects.filter(username=phone).first()
+        if not user:
             user = Account.objects.create(
                 username=phone,
                 password="12345678"
             )
             user.save()
             verify(phone)
-        except:
-            obj = OrderClient.objects.filter(id=id).first()
-            obj.client.username = phone
+        obj = OrderClient.objects.filter(id=order_id).first()
+        obj.status = 'specialist'
+        obj.level_order = 2
+        obj.client = user
+        obj.save()
 
     def get_success_headers(self, data):
         try:
@@ -62,46 +75,132 @@ class OrderClientCreateAPIView(generics.CreateAPIView):
             return {}
 
 
+# receiver
 class OrderClientListAPIView(generics.ListAPIView):
-    queryset = OrderClient.objects.all()
     serializer_class = serializers.OrderClientListSerializer
 
+    def get_queryset(self):
+        queryset = OrderClient.objects.all().order_by("-id")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        week = self.request.GET.get('week')
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        if week:
+            queryset = queryset.filter(
+                created_time__range=[datetime.datetime.now() - datetime.timedelta(days=7), datetime.datetime.now()])
+        if month:
+            queryset = queryset.filter(created_time__month=datetime.datetime.now().month)
+        if year:
+            queryset = queryset.filter(created_time__year=datetime.datetime.now().year)
+        return queryset
 
+
+# specialist
+class OrderClientSpecialistListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(status='specialist').order_by("-id")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        week = self.request.GET.get('week')
+        month = self.request.GET.get('month')
+        year = self.request.GET.get('year')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        if week:
+            queryset = queryset.filter(
+                created_time__range=[datetime.datetime.now() - datetime.timedelta(days=7), datetime.datetime.now()])
+        if month:
+            queryset = queryset.filter(created_time__month=datetime.datetime.now().month)
+        if year:
+            queryset = queryset.filter(created_time__year=datetime.datetime.now().year)
+        return queryset
+
+
+# specialist
 class OrderClientRetrieveAPIView(generics.RetrieveAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.OrderClientListSerializer
 
 
-class Inspector1UpdateAPIView(generics.UpdateAPIView):
-    queryset = OrderClient.objects.all()
-    serializer_class = serializers.Inspector1Serializer
-
-
-class Inspector2UpdateAPIView(generics.UpdateAPIView):
-    queryset = OrderClient.objects.all()
-    serializer_class = serializers.Inspector2Serializer
-
-
-class SpecialistAPIView(generics.CreateAPIView):
+# specialist
+class SpecialistCreateAPIView(generics.CreateAPIView):
     queryset = OrderClientProducts.objects.all()
     serializer_class = serializers.SpecialistSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        order_id = serializer.data['order']
+        order = OrderClient.objects.get(id=order_id)
+        order.level_order = 3
+        order.status = 'accountant'
+        order.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def perform_create(self, serializer):
+        serializer.save()
+
+    def get_success_headers(self, data):
+        try:
+            return {'Location': str(data[api_settings.URL_FIELD_NAME])}
+        except (TypeError, KeyError):
+            return {}
+
+
+# Accountant
 class AccountantListAPIView(generics.ListAPIView):
-    queryset = OrderClient.objects.all()
     serializer_class = serializers.AccountantSerializer
 
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(status="accountant", level_order=3).order_by("-id")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        return queryset
 
-class AccountantRetrieveAPIView(generics.RetrieveAPIView):
-    queryset = OrderClient.objects.all()
-    serializer_class = serializers.AccountantSerializer
 
-
+# accountant
 class AccountantUpdateAPIView(generics.UpdateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.AccountantUpdateSerializer
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        instance.status = 'payment'
+        instance.level_order = 4
+        instance.save()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
 
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+
+# Statistics
 class StatisticsAPIView(APIView):
     def get(self, request):
         queryset = OrderClient.objects.all()
@@ -131,3 +230,30 @@ class StatisticsAPIView(APIView):
             'end': queryset.filter(status='end').count(),
         }
         return Response(data, status=200)
+
+
+# inspectors
+
+
+class Inspector1UpdateAPIView(generics.UpdateAPIView):
+    queryset = OrderClient.objects.all()
+    serializer_class = serializers.Inspector1Serializer
+
+
+class Inspector2UpdateAPIView(generics.UpdateAPIView):
+    queryset = OrderClient.objects.all()
+    serializer_class = serializers.Inspector2Serializer
+
+
+class OrderClientInstructorListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(is_paid=True).order_by("-id")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        return queryset
