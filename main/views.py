@@ -6,6 +6,9 @@ from rest_framework import generics, authentication, permissions
 from rest_framework.views import Response, status, APIView
 from . import serializers
 from accounts.utils import verify
+from .serializers import OrderClientListSerializer, OrderClientListForUzSerializer
+from django.utils import timezone
+from datetime import timedelta
 
 
 # uz standard
@@ -87,16 +90,17 @@ class OrderClientListAPIView(generics.ListAPIView):
         month = self.request.GET.get('month')
         year = self.request.GET.get('year')
         if today:
-            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+            queryset = queryset.filter(created_time__day=timezone.now().day)
         if yesterday:
-            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+            queryset = queryset.filter(created_time__day=timezone.now().day - 1)
         if week:
+            print(datetime.datetime.now() - datetime.timedelta(days=7))
             queryset = queryset.filter(
-                created_time__range=[datetime.datetime.now() - datetime.timedelta(days=7), datetime.datetime.now()])
+                created_time__range=[timezone.now() - timedelta(days=7), timezone.now()])
         if month:
-            queryset = queryset.filter(created_time__month=datetime.datetime.now().month)
+            queryset = queryset.filter(created_time__month=timezone.now().month)
         if year:
-            queryset = queryset.filter(created_time__year=datetime.datetime.now().year)
+            queryset = queryset.filter(created_time__year=timezone.now().year)
         return queryset
 
 
@@ -257,3 +261,23 @@ class OrderClientInstructorListAPIView(generics.ListAPIView):
         if yesterday:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
         return queryset
+
+
+# client
+class ClientListAPIView(generics.ListAPIView):
+    serializer_class = OrderClientListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+
+    def get_queryset(self):
+        qs = OrderClient.objects.filter(client_id=self.request.user.id)
+        return qs
+
+
+# uz standard
+class UzStandardListAPIView(generics.ListAPIView):
+    serializer_class = OrderClientListForUzSerializer
+
+    def get_queryset(self):
+        qs = OrderClient.objects.filter(status='docs')
+        return qs

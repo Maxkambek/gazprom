@@ -58,6 +58,13 @@ class OrderClient(models.Model):
     def __str__(self):
         return self.name_org
 
+    @property
+    def get_full_amount(self):
+        amount = 0
+        for i in self.order_products.all():
+            amount += i.product.price * i.count
+        return amount
+
 
 class OrderClientFile(models.Model):
     file = models.FileField(upload_to='files/')
@@ -69,7 +76,7 @@ class OrderClientFile(models.Model):
 
 class OrderClientProducts(models.Model):
     order = models.ForeignKey(OrderClient, on_delete=models.SET_NULL, null=True, related_name='order_products')
-    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, related_name='order_product')
     count = models.PositiveIntegerField(default=1)
 
 

@@ -20,5 +20,7 @@ urlpatterns = [
     path('inspector-order-list/', views.OrderClientInstructorListAPIView.as_view()),
     path('inspector-1/<int:pk>/', views.Inspector1UpdateAPIView.as_view()),
     path('inspector-2/<int:pk>/', views.Inspector2UpdateAPIView.as_view()),
-    path('uz-standard/', views.UzStandardCreateAPIView.as_view())
+    path('uz-standard/', views.UzStandardCreateAPIView.as_view()),
+    path('client/', views.ClientListAPIView.as_view()),
+    path('list-for-uzstandard/', views.UzStandardListAPIView.as_view()),
 ]
