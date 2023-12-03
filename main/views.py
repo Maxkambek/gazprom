@@ -104,12 +104,21 @@ class OrderClientListAPIView(generics.ListAPIView):
         return queryset
 
 
+# receiver
+class OrderClientForEndListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.all().order_by('-id')
+        return queryset
+
+
 # specialist
 class OrderClientSpecialistListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
 
     def get_queryset(self):
-        queryset = OrderClient.objects.filter(status='specialist').order_by("-id")
+        queryset = OrderClient.objects.filter(status='specialist', inspector_2=True).order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
         week = self.request.GET.get('week')
@@ -243,17 +252,75 @@ class Inspector1UpdateAPIView(generics.UpdateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.Inspector1Serializer
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        instance.inspector_1 = True
+        instance.level_order += 1
+        instance.save()
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
 
 class Inspector2UpdateAPIView(generics.UpdateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.Inspector2Serializer
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        instance.inspector_2 = True
+        instance.status = 'specialist'
+        instance.level_order += 1
+        instance.save()
 
-class OrderClientInstructorListAPIView(generics.ListAPIView):
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        return Response(serializer.data)
+
+    def perform_update(self, serializer):
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
+
+
+class OrderClientInstructor1ListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
 
     def get_queryset(self):
-        queryset = OrderClient.objects.filter(is_paid=True).order_by("-id")
+        queryset = OrderClient.objects.filter(is_paid=True, inspector_1=False).order_by("-id")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        return queryset
+
+
+class OrderClientInstructor2ListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(is_paid=True, inspector_2=False, is_checked=False,
+                                              inspector_1=True).order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
         if today:
@@ -281,3 +348,4 @@ class UzStandardListAPIView(generics.ListAPIView):
     def get_queryset(self):
         qs = OrderClient.objects.filter(status='docs')
         return qs
+

@@ -39,13 +39,15 @@ class OrderClientCreateSerializer(serializers.ModelSerializer):
 
 
 class OrderClientListSerializer(serializers.ModelSerializer):
+    order_products = OrderClientProductsSerializer(many=True)
+
     class Meta:
         model = OrderClient
         fields = ['id', 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
                   'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'phone', 'client',
-                  'is_checked', 'is_paid']
+                  'is_checked', 'is_paid','order_products', 'get_full_amount']
 
 
 class OrderClientListForUzSerializer(serializers.ModelSerializer):
