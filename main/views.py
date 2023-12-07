@@ -61,7 +61,9 @@ class OrderClientCreateAPIView(generics.CreateAPIView):
         if not user:
             user = Account.objects.create(
                 username=phone,
-                password="12345678"
+                password="12345678",
+                role="client",
+                is_active=True
             )
             user.save()
             verify(phone)
@@ -118,7 +120,7 @@ class OrderClientSpecialistListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
 
     def get_queryset(self):
-        queryset = OrderClient.objects.filter(status='specialist', inspector_2=True).order_by("-id")
+        queryset = OrderClient.objects.filter(status='specialist').order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
         week = self.request.GET.get('week')
@@ -176,7 +178,7 @@ class AccountantListAPIView(generics.ListAPIView):
     serializer_class = serializers.AccountantSerializer
 
     def get_queryset(self):
-        queryset = OrderClient.objects.filter(status="accountant", level_order=3).order_by("-id")
+        queryset = OrderClient.objects.filter(status="accountant").order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
         if today:
