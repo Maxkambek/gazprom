@@ -371,3 +371,13 @@ class SpecialistUpdateAPIView(generics.UpdateAPIView):
 class Reciever2UpdateAPIView(generics.UpdateAPIView):
     serializer_class = serializers.Receiver2Serializer
     queryset = OrderClient.objects.all()
+
+
+class StendListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+    queryset = OrderClient.objects.filter(status="test")
+
+
+class StendUpdateAPIView(generics.UpdateAPIView):
+    serializer_class = serializers.Specialist2Serializer
+    queryset = OrderClient.objects.all()

@@ -35,5 +35,9 @@ urlpatterns = [
     path('update-spcialist-2/<int:pk>/', views.SpecialistUpdateAPIView.as_view()),
 
     # reciever -2
-    path('recevier-update-2/<int:pk>/', views.Reciever2UpdateAPIView.as_view())
+    path('recevier-update-2/<int:pk>/', views.Reciever2UpdateAPIView.as_view()),
+
+    # stend
+    path('stend-list/', views.StendListAPIView.as_view()),
+    path('stend-update/<int:pk>/', views.StendUpdateAPIView.as_view())
 ]
