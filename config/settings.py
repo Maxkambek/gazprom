@@ -29,7 +29,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'accounts',
     'main',
-    'simple_history'
+    'simple_history',
+    'payme',
+    'payment'
 ]
 
 MIDDLEWARE = [

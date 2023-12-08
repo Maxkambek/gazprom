@@ -41,6 +41,11 @@ class ProductListAPIView(generics.ListAPIView):
         return queryset
 
 
+class ProductRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.ProductSerializer
+    queryset = Product.objects.all()
+
+
 # receiver
 class OrderClientCreateAPIView(generics.CreateAPIView):
     queryset = OrderClient.objects.all()
@@ -351,3 +356,18 @@ class UzStandardListAPIView(generics.ListAPIView):
         qs = OrderClient.objects.filter(status='docs')
         return qs
 
+
+# specialist 2
+class Specialist2ListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+    queryset = OrderClient.objects.filter(status="specialist_2")
+
+
+class SpecialistUpdateAPIView(generics.UpdateAPIView):
+    serializer_class = serializers.Specialist2Serializer
+    queryset = OrderClient.objects.all()
+
+
+class Reciever2UpdateAPIView(generics.UpdateAPIView):
+    serializer_class = serializers.Receiver2Serializer
+    queryset = OrderClient.objects.all()

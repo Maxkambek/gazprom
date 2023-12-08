@@ -47,7 +47,7 @@ class OrderClientListSerializer(serializers.ModelSerializer):
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
                   'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'phone', 'client',
-                  'is_checked', 'is_paid','order_products', 'get_full_amount']
+                  'is_checked', 'is_paid', 'order_products', 'get_full_amount']
 
 
 class OrderClientListForUzSerializer(serializers.ModelSerializer):
@@ -96,3 +96,15 @@ class AccountantUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderClient
         fields = ['id', 'ready_for_paid']
+
+
+class Specialist2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderClient
+        fields = ['id', 'status']
+
+
+class Receiver2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderClient
+        fields = ['id', 'status']

@@ -33,6 +33,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
         ("uz_standard", "uz_standard"),
         ("inspector_1", "inspector_1"),
         ("inspector_2", "inspector_2"),
+        ("sten", "sten"),
     )
     username = models.CharField(max_length=64, unique=True)
     full_name = models.CharField(max_length=350, null=True, blank=True)

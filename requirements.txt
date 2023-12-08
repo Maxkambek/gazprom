@@ -7,11 +7,13 @@ django-cors-headers==4.3.1
 django-jazzmin==2.6.0
 django-js-asset==2.1.0
 django-modeltranslation==0.18.11
+django-simple-history==3.4.0
 djangorestframework==3.14.0
 drf-yasg==1.21.7
 idna==3.6
 inflection==0.5.1
 packaging==23.2
+payme-pkg==2.6.6
 Pillow==10.1.0
 pytz==2023.3.post1
 PyYAML==6.0.1

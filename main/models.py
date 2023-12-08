@@ -18,6 +18,7 @@ STATUS = (
     ("specialist", "specialist"),
     ("accountant", "accountant"),
     ('payment', 'payment'),
+    ("specialist_2", "specialist_2"),
     ("test", "test"),
     ("docs", "docs"),
     ("end", "end"),
