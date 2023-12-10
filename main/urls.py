@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # receive
     path('order-create/', views.OrderClientCreateAPIView.as_view()),
+    path('order-update/<int:pk>/', views.OrderClientUpdateAPIView.as_view()),
     path('order-file-create/', views.OrderClientFileCreateAPIView.as_view()),
     path('order/<int:pk>/', views.OrderClientRetrieveAPIView.as_view()),
     path('orders/', views.OrderClientListAPIView.as_view()),
@@ -27,6 +28,7 @@ urlpatterns = [
     path('inspector-1/<int:pk>/', views.Inspector1UpdateAPIView.as_view()),
     path('inspector-2/<int:pk>/', views.Inspector2UpdateAPIView.as_view()),
     path('uz-standard/', views.UzStandardCreateAPIView.as_view()),
+
     path('client/', views.ClientListAPIView.as_view()),
     path('list-for-uzstandard/', views.UzStandardListAPIView.as_view()),
 
@@ -36,6 +38,7 @@ urlpatterns = [
 
     # reciever -2
     path('recevier-update-2/<int:pk>/', views.Reciever2UpdateAPIView.as_view()),
+    path('recevier-list-2/', views.Reciever2ListAPIView.as_view()),
 
     # stend
     path('stend-list/', views.StendListAPIView.as_view()),

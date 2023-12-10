@@ -47,6 +47,11 @@ class ProductRUDAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 # receiver
+class OrderClientUpdateAPIView(generics.UpdateAPIView):
+    queryset = OrderClient.objects.all()
+    serializer_class = serializers.OrderClientCreateSerializer
+
+
 class OrderClientCreateAPIView(generics.CreateAPIView):
     queryset = OrderClient.objects.all()
     serializer_class = serializers.OrderClientCreateSerializer
@@ -292,7 +297,7 @@ class Inspector2UpdateAPIView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         instance.inspector_2 = True
-        instance.status = 'specialist'
+        instance.status = 'specialist_2'
         instance.level_order += 1
         instance.save()
 
@@ -312,7 +317,7 @@ class OrderClientInstructor1ListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
 
     def get_queryset(self):
-        queryset = OrderClient.objects.filter(is_paid=True, inspector_1=False).order_by("-id")
+        queryset = OrderClient.objects.filter(is_paid=True, inspector_1=False, status='inspector_1').order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
         if today:
@@ -353,7 +358,7 @@ class UzStandardListAPIView(generics.ListAPIView):
     serializer_class = OrderClientListForUzSerializer
 
     def get_queryset(self):
-        qs = OrderClient.objects.filter(status='docs')
+        qs = OrderClient.objects.filter(status='end')
         return qs
 
 
@@ -371,6 +376,11 @@ class SpecialistUpdateAPIView(generics.UpdateAPIView):
 class Reciever2UpdateAPIView(generics.UpdateAPIView):
     serializer_class = serializers.Receiver2Serializer
     queryset = OrderClient.objects.all()
+
+
+class Reciever2ListAPIView(generics.ListAPIView):
+    serializer_class = serializers.OrderClientListSerializer
+    queryset = OrderClient.objects.filter(status='docs')
 
 
 class StendListAPIView(generics.ListAPIView):

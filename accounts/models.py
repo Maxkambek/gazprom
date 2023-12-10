@@ -43,8 +43,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(choices=ROLE, max_length=25, default='receiver')
     history = HistoricalRecords()
 
-    USERNAME_FIELD = 'username'
     objects = AccountManager()
+    USERNAME_FIELD = 'username'
+
 
     def __str__(self):
         return self.username
