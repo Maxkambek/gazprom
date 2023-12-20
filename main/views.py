@@ -206,9 +206,14 @@ class AccountantUpdateAPIView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        instance.status = 'payment'
-        instance.level_order = 4
-        instance.save()
+        if instance.is_paid:
+            instance.status = 'inspector_1'
+            instance.level_order = 5
+            instance.save()
+        else:
+            instance.status = 'payment'
+            instance.level_order = 4
+            instance.save()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)

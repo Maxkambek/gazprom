@@ -107,4 +107,4 @@ class Specialist2Serializer(serializers.ModelSerializer):
 class Receiver2Serializer(serializers.ModelSerializer):
     class Meta:
         model = OrderClient
-        fields = ['id', 'status']
+        fields = ['id', 'is_paid', 'status']
