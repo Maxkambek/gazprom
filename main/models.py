@@ -67,6 +67,10 @@ class OrderClient(models.Model):
             amount += i.product.price * i.count
         return amount
 
+    class Meta:
+        verbose_name = "Заказ"
+        verbose_name_plural = "Заказы"
+
 
 class OrderClientFile(models.Model):
     file = models.FileField(upload_to='files/')
