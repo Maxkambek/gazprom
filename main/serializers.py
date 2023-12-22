@@ -14,6 +14,12 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'number_hash', 'count', 'come_time', 'price']
 
 
+class UzStandardFileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UzStandard
+        fields = '__all__'
+
+
 class OrderClientProductsSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
 
@@ -31,7 +37,7 @@ class OrderClientFileSerializer(serializers.ModelSerializer):
 class OrderClientCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderClient
-        fields = ['id', 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
+        fields = ['id', "inn", 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
                   'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'phone',
@@ -40,25 +46,28 @@ class OrderClientCreateSerializer(serializers.ModelSerializer):
 
 class OrderClientListSerializer(serializers.ModelSerializer):
     order_products = OrderClientProductsSerializer(many=True)
+    uaz_standard_files = UzStandardFileSerializer(many=True)
 
     class Meta:
         model = OrderClient
-        fields = ['id', 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
+        fields = ['id', "inn", 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
                   'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'phone', 'client',
-                  'is_checked', 'is_paid', 'order_products', 'get_full_amount']
+                  'is_checked', 'is_paid', 'order_products', 'get_full_amount', 'uaz_standard_files']
 
 
 class OrderClientListForUzSerializer(serializers.ModelSerializer):
     order_files = OrderClientFileSerializer(many=True)
+    uaz_standard_files = UzStandardFileSerializer(many=True)
 
     class Meta:
         model = OrderClient
-        fields = ['id', 'name_org', 'created_time', 'meter_brand', 'serial_number', 'temp_sensor',
+        fields = ['id', "inn", 'name_org', 'created_time', 'meter_brand', 'serial_number', 'temp_sensor',
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
-                  'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'order_files']
+                  'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'order_files',
+                  'uaz_standard_files']
 
 
 class Inspector1Serializer(serializers.ModelSerializer):
@@ -82,14 +91,15 @@ class SpecialistSerializer(serializers.ModelSerializer):
 class AccountantSerializer(serializers.ModelSerializer):
     order_files = OrderClientFileSerializer(many=True)
     order_products = OrderClientProductsSerializer(many=True)
+    uaz_standard_files = UzStandardFileSerializer(many=True)
 
     class Meta:
         model = OrderClient
-        fields = ['id', 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
+        fields = ['id', 'inn', 'name_org', 'created_time', 'status', 'meter_brand', 'serial_number', 'temp_sensor',
                   'latest_certificate', 'passport_meter', 'correction_block_passport', 'verification_with_stamp',
                   'gaz_pribor_stamp', 'block_correction_dp', 'dt', 'dd', 'er_300000', 'visual_damage',
                   'mechanical_damage', 'conclusion', 'indications', 'counting_mechanism', 'phone', 'client',
-                  'is_checked', 'is_paid', 'order_files', 'order_products', 'get_full_amount']
+                  'is_checked', 'is_paid', 'order_files', 'order_products', 'get_full_amount', 'uaz_standard_files']
 
 
 class AccountantUpdateSerializer(serializers.ModelSerializer):

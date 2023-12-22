@@ -27,6 +27,7 @@ STATUS = (
 
 
 class OrderClient(models.Model):
+    inn = models.CharField(max_length=123, null=True, blank=True)
     is_paid = models.BooleanField(default=False)
     name_org = models.CharField(max_length=333)
     created_time = models.DateTimeField()
