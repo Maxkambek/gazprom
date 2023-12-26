@@ -198,6 +198,21 @@ class AccountantListAPIView(generics.ListAPIView):
         return queryset
 
 
+class AccountantHistoryAPIView(generics.ListAPIView):
+    serializer_class = serializers.AccountantSerializer
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.all().exclude(status="received").exclude(status="specialist").exclude(
+            status="accountant")
+        today = self.request.GET.get('today')
+        yesterday = self.request.GET.get('yesterday')
+        if today:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
+        if yesterday:
+            queryset = queryset.filter(created_time__day=datetime.datetime.now().day - 1)
+        return queryset
+
+
 # accountant
 class AccountantUpdateAPIView(generics.UpdateAPIView):
     queryset = OrderClient.objects.all()

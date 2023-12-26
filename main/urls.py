@@ -19,6 +19,7 @@ urlpatterns = [
 
     # accountant
     path('accountant/', views.AccountantListAPIView.as_view()),
+    path('accountant-history/', views.AccountantHistoryAPIView.as_view()),
     path('accountant/<int:pk>/', views.AccountantUpdateAPIView.as_view()),
     path('statictics/', views.StatisticsAPIView.as_view()),
 
