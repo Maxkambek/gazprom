@@ -8,17 +8,16 @@ from django.contrib.auth import authenticate
 from hashlib import sha1
 import hashlib
 
-
-hash_algorithm = 'sha256'  
+hash_algorithm = 'sha256'
 
 
 class LoginAPI(generics.GenericAPIView):
     serializer_class = LoginSerializer
- 
+
     def post(self, request):
         username = request.data['username']
         pas = request.data['password']
-        user = Account.objects.filter(username=username,password=pas).first()
+        user = Account.objects.filter(username=username, password=pas).first()
         print(user)
         if not user:
             return Response({'message': 'Bunaqa user yogu nima qilamiza endi'}, status=status.HTTP_404_NOT_FOUND)
@@ -27,6 +26,8 @@ class LoginAPI(generics.GenericAPIView):
         data['token'] = str(token)
         data['success'] = True
         data['role'] = user.role
+        if user.full_name:
+            data['name'] = user.full_name
         return Response(data, status=status.HTTP_200_OK)
 
 
