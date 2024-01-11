@@ -433,8 +433,7 @@ class Reciever2ListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         name = self.request.query_params.get('name')
-        queryset = OrderClient.objects.all().exclude(status="received").exclude(status="specialist").exclude(
-            status="accountant").exclude(status="specialist_2").exclude(status='payment').exclude(status="test")
+        queryset = OrderClient.objects.filter(status="docs")
         if name:
             queryset = queryset.filter(name_org__icontains=name)
         return queryset
