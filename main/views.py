@@ -101,6 +101,9 @@ class OrderClientListAPIView(generics.ListAPIView):
         week = self.request.GET.get('week')
         month = self.request.GET.get('month')
         year = self.request.GET.get('year')
+        name = self.request.GET.get('name')
+        if name:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=timezone.now().day)
         if yesterday:
@@ -121,7 +124,10 @@ class OrderClientForEndListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
 
     def get_queryset(self):
+        name = self.request.GET.get('name')
         queryset = OrderClient.objects.all().order_by('-id')
+        if name:
+            queryset = queryset.filter(name_org__icontains=name)
         return queryset
 
 
@@ -136,6 +142,9 @@ class OrderClientSpecialistListAPIView(generics.ListAPIView):
         week = self.request.GET.get('week')
         month = self.request.GET.get('month')
         year = self.request.GET.get('year')
+        name = self.request.GET.get('name')
+        if name:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
@@ -191,6 +200,9 @@ class AccountantListAPIView(generics.ListAPIView):
         queryset = OrderClient.objects.filter(status="accountant").order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
+        name = self.request.GET.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
@@ -206,6 +218,9 @@ class AccountantHistoryAPIView(generics.ListAPIView):
             status="accountant")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
+        name = self.request.GET.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
@@ -340,6 +355,9 @@ class OrderClientInstructor1ListAPIView(generics.ListAPIView):
         queryset = OrderClient.objects.filter(is_paid=True, inspector_1=False, status='inspector_1').order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
+        name = self.request.GET.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
@@ -355,6 +373,9 @@ class OrderClientInstructor2ListAPIView(generics.ListAPIView):
                                               inspector_1=True).order_by("-id")
         today = self.request.GET.get('today')
         yesterday = self.request.GET.get('yesterday')
+        name = self.request.GET.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
         if today:
             queryset = queryset.filter(created_time__day=datetime.datetime.now().day)
         if yesterday:
@@ -379,13 +400,22 @@ class UzStandardListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         qs = OrderClient.objects.filter(status='end')
+        name = self.request.GET.get('name')
+        if name is not None:
+            qs = qs.filter(name_org__icontains=name)
         return qs
 
 
 # specialist 2
 class Specialist2ListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
-    queryset = OrderClient.objects.filter(status="specialist_2")
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(status="specialist_2")
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
+        return queryset
 
 
 class SpecialistUpdateAPIView(generics.UpdateAPIView):
@@ -400,12 +430,25 @@ class Reciever2UpdateAPIView(generics.UpdateAPIView):
 
 class Reciever2ListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
-    queryset = OrderClient.objects.filter(status='docs')
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+        queryset = OrderClient.objects.all().exclude(status="received").exclude(status="specialist").exclude(
+            status="accountant").exclude(status="specialist_2").exclude(status='payment').exclude(status="test")
+        if name:
+            queryset = queryset.filter(name_org__icontains=name)
+        return queryset
 
 
 class StendListAPIView(generics.ListAPIView):
     serializer_class = serializers.OrderClientListSerializer
-    queryset = OrderClient.objects.filter(status="test")
+
+    def get_queryset(self):
+        queryset = OrderClient.objects.filter(status="test")
+        name = self.request.query_params.get('name')
+        if name is not None:
+            queryset = queryset.filter(name_org__icontains=name)
+        return queryset
 
 
 class StendUpdateAPIView(generics.UpdateAPIView):
